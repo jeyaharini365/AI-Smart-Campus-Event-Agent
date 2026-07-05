@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserPlus } from "lucide-react";
 import api from "../api/axios";
 
 function Register() {
@@ -40,19 +39,20 @@ function Register() {
       setSuccess("Registration successful! Redirecting to login...");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      setError(
-        err.response?.data?.detail || "Registration failed. Please try again."
-      );
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map((d) => d.msg).join(", "));
+      } else if (typeof detail === "string") {
+        setError(detail);
+      } else {
+        setError("Registration failed. Please try again.");
+      }
     }
   };
 
   return (
     <div className="page-container">
-      <h2 style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-        <UserPlus size={26} /> Register
-      </h2>
-      {error && <p className="error-text">{error}</p>}
-      {success && <p className="success-text">{success}</p>}
+      <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Full Name</label>
@@ -109,7 +109,9 @@ function Register() {
             onChange={handleChange}
           />
         </div>
-        <button className="btn-primary" type="submit">
+        {error && <p className="error-text">{error}</p>}
+        {success && <p className="success-text">{success}</p>}
+        <button type="submit" className="btn-primary">
           Register
         </button>
       </form>
