@@ -42,6 +42,7 @@ function Events() {
         custom_fields_responses: {},
       });
       setMessage("Successfully registered!");
+      fetchEvents();
     } catch (err) {
       setError(err.response?.data?.detail || "Registration failed.");
     }
@@ -213,6 +214,11 @@ function Events() {
               {event.status}
             </span>
           </p>
+          {organizer && (
+            <p style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <Users size={16} /> <strong>Registered:</strong> {event.registered_count} / {event.capacity}
+            </p>
+          )}
           {!organizer && (
             <button
               className="btn-primary"
