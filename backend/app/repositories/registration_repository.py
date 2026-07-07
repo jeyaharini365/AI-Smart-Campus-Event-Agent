@@ -51,6 +51,15 @@ class RegistrationRepository:
         return registrations
 
     @staticmethod
+    async def get_registrations_by_event(event_id: str) -> List[dict]:
+        db = get_database()
+        registrations = await db.registrations.find({
+            "event_id": ObjectId(event_id),
+            "status": {"$ne": "cancelled"}
+        }).to_list(length=None)
+        return registrations
+
+    @staticmethod
     async def get_registration_by_id(registration_id: str) -> Optional[dict]:
         db = get_database()
         if not ObjectId.is_valid(registration_id):

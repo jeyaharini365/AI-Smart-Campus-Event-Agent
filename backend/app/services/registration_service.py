@@ -78,3 +78,22 @@ class RegistrationService:
         )
 
         return RegistrationPublic(**updated)
+
+    @staticmethod
+    async def get_registrations_for_event(event_id: str, current_user: UserDB) -> list[RegistrationPublic]:
+        event = await EventRepository.get_event_by_id(event_id)
+
+        if not event:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Event not found"
+            )
+
+        if str(event["organizer_id"]) != str(current_user.id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only view registrations for your own events"
+            )
+
+        registrations = await RegistrationRepository.get_registrations_by_event(event_id)
+        return [RegistrationPublic(**reg) for reg in registrations]
